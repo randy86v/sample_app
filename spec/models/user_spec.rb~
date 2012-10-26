@@ -12,6 +12,7 @@ describe User do
   it { should respond_to(:password_digest) }
   it { should respond_to(:password) }
   it { should respond_to(:password_confirmation) }
+  it { should respond_to(:authenticate) }
   
   it { should be_valid }
   
@@ -32,6 +33,7 @@ describe User do
     it { should_not be_valid }
   end
     
+  #tests for email's format  
   describe "when email format is invalid" do
     it "should be invalid" do
       addresses = %w[user@foo,com user_at_foo.org example.user@foo.
@@ -43,7 +45,7 @@ describe User do
     end
   end
   
- describe "when email format is valid" do
+  describe "when email format is valid" do
     it "should be valid" do
       addresses = %w[user@foo.COM A_US-ER@f.b.org frst.lst@foo.jp a+b@baz.cn]
       addresses.each do |valid_address|
@@ -53,6 +55,7 @@ describe User do
     end
   end
   
+  #tests for email uniqueness
   describe "when email address is already taken" do
     before do
       user_with_same_email = @user.dup      #@user.dup creates a duplicate user with same attribute
@@ -62,7 +65,7 @@ describe User do
     it { should_not be_valid }
   end
   
-  #this time it test the case_sensitivity of email
+  #this time it tests the case_sensitivity of email in terms of uniqueness
   describe "when email address is already taken" do
     before do
       user_with_same_email = @user.dup
@@ -73,6 +76,7 @@ describe User do
     it { should_not be_valid }
   end
   
+  #tests for password confirmation
   describe "when password is not present" do
     before { @user.password = @user.password_confirmation = " " }
     it { should_not be_valid }
@@ -86,5 +90,27 @@ describe User do
   describe "when password confirmation is nil" do
     before { @user.password_confirmation = nil }
     it { should_not be_valid }
+  end
+  
+  #tests for authenticate method on password
+  describe "with a password that's too short" do
+    before { @user.password = @user.password_confirmation = "a" * 5 }
+    it { should be_invalid }
+  end
+
+  describe "return value of authenticate method" do
+    before { @user.save }
+    let(:found_user) { User.find_by_email(@user.email) }
+
+    describe "with valid password" do
+      it { should == found_user.authenticate(@user.password) }
+    end
+
+    describe "with invalid password" do
+      let(:user_for_invalid_password) { found_user.authenticate("invalid") }
+
+      it { should_not == user_for_invalid_password }
+      specify { user_for_invalid_password.should be_false }
+    end
   end
 end

@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
   #the email attribute before saving the user to the database.
   #Callback is a method that gets invoked at a particular point 
   #in the lifetime of an Active Record object
-  before_save { |user| user.email = user.email.downcase }
+  before_save { |user| user.email = user.email.downcase }   #alternative -> before_save { self.email.downcase!}
   
   validates :name, presence: true, length: {maximum: 50}  
   #second argument is a hash within a hash
@@ -19,7 +19,7 @@ class User < ActiveRecord::Base
   
   #the same as :presence => true <- which is a hash
   validates :email, presence: true, 
-                    format: { with: VALID_EMAIL_REGEX }, 
+                    format: { with: VALID_EMAIL_REGEX, on: :create }, 
                     uniqueness: { case_sensitive: false }
   
   validates :password, presence: true, length: { minimum: 6 }
