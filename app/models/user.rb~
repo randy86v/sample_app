@@ -19,7 +19,7 @@ class User < ActiveRecord::Base
   
   #the same as :presence => true <- which is a hash
   validates :email, presence: true, 
-                    format: { with: VALID_EMAIL_REGEX }, 
+                    format: { with: VALID_EMAIL_REGEX, on: :create }, 
                     uniqueness: { case_sensitive: false }
   
   validates :password, presence: true, length: { minimum: 6 }
