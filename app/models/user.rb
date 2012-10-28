@@ -10,6 +10,7 @@ class User < ActiveRecord::Base
   #Callback is a method that gets invoked at a particular point 
   #in the lifetime of an Active Record object
   before_save { |user| user.email = user.email.downcase }   #alternative -> before_save { self.email.downcase!}
+  before_save :create_remember_token 
   
   validates :name, presence: true, length: {maximum: 50}  
   #second argument is a hash within a hash
@@ -24,4 +25,9 @@ class User < ActiveRecord::Base
   
   validates :password, length: { minimum: 6 }
   validates :password_confirmation, presence: true
+  
+  private
+    def create_remember_token
+      self.remember_token = SecureRandom.urlsafe_base64
+    end
 end
