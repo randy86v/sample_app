@@ -52,6 +52,9 @@ describe "Authentication" do
     describe "for non-signed-in users" do
       let(:user) { FactoryGirl.create(:user) }
       
+      it { should_not have_link('Profile') }
+      it { should_not have_link('Settings') }
+      
       describe "when attempting to visit protected page" do
         before do
           visit edit_user_path user
@@ -64,6 +67,17 @@ describe "Authentication" do
           
           it "should render the desired protected page" do
             page.should have_selector('title', text: 'Edit user')
+          end
+          
+          describe "when signing in again" do
+            before do
+              delete signout_path
+              sign_in user              
+            end
+            
+            it "should render default profile page" do
+              page.should have_selector('title', text: user.name)
+            end
           end
         end
       end
@@ -91,7 +105,7 @@ describe "Authentication" do
           before { visit users_path }
           it { should have_selector('title', text: 'Sign in') }
         end
-      end
+      end      
     end
     
     describe "as wrong user" do
