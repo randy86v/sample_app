@@ -9,7 +9,8 @@ class User < ActiveRecord::Base
   #the email attribute before saving the user to the database.
   #Callback is a method that gets invoked at a particular point 
   #in the lifetime of an Active Record object
-  before_save { |user| user.email = user.email.downcase }   #alternative -> before_save { self.email.downcase!}
+  before_save { |user| user.email = user.email.downcase }   
+  #alternative -> before_save { self.email.downcase!}
   before_save :create_remember_token 
   
   validates :name, presence: true, length: {maximum: 50}  
