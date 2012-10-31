@@ -1,0 +1,13 @@
+class Micropost < ActiveRecord::Base
+  attr_accessible :content
+  
+  belongs_to :user
+  
+  validates :user_id, presence: true
+  validates :content, presence: true, length: { maximum: 140 }
+  
+  #The order here is ’microposts.created_at DESC’, where DESC
+  #is SQL for “descending”, i.e., in descending order from newest to oldest
+  default_scope order: "microposts.created_at DESC"
+  #This passes the 'User micropost associations' test in user_spec.rb
+end

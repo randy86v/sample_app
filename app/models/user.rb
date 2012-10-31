@@ -1,6 +1,10 @@
 class User < ActiveRecord::Base
   attr_accessible :email, :name, :password, :password_confirmation
   
+  has_many :microposts, dependent: :destroy
+  #the option 'dependent: :destroy' arranges for dependent micropost(i.e., 
+  #the ones belonging to the given user) to be destroyed when the user itself is destroyed.
+  
   #As long as there is a password_digest column in the database, 
   #adding this one method to our model gives us a secure way to create and authenticate new users.
   has_secure_password
@@ -11,6 +15,7 @@ class User < ActiveRecord::Base
   #in the lifetime of an Active Record object
   before_save { |user| user.email = user.email.downcase }   
   #alternative -> before_save { self.email.downcase!}
+  
   before_save :create_remember_token 
   
   validates :name, presence: true, length: {maximum: 50}  
@@ -26,6 +31,11 @@ class User < ActiveRecord::Base
   
   validates :password, length: { minimum: 6 }
   validates :password_confirmation, presence: true
+  
+  def feed
+    # This is preliminary. See "Following users" for the full implementation.
+    Micropost.where("user_id = ?", id)
+  end
   
   private
     def create_remember_token
